@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/finance/PaymentSplitter.sol";
+import "./Base64.sol";
 
 contract PinaPunks is ERC721, ERC721Enumerable, PaymentSplitter {
     
@@ -30,7 +31,22 @@ contract PinaPunks is ERC721, ERC721Enumerable, PaymentSplitter {
 
     }
 
-    //Recibir ETH cada vez que se mint
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        require(_exists(tokenId), "ERC721 Metadata: URI query for nonexistent token");
+        
+        string memory jsonURI = Base64.encode(
+            abi.encodePacked(
+                '{ "name": "PinaPunks #',
+                tokenId,
+                '"external_url": "ipfs://<hash>"',
+                '", "description": "PinaPunks  customized Avataaars stored on chain to teach DApp development on PinaDev", "image": "',
+                "// TODO: Calculate image URL",
+                '"}'
+            )
+        );
+
+        return string(abi.encodePacked("data:application/json;base64,", jsonURI));
+    }
 
     //Override required
     function _beforeTokenTransfer(address from, address to, uint256 tokenId)
